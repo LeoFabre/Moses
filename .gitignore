@@ -1,0 +1,18 @@
+#JUCE generated content
+Builds
+BinaryData.h
+BinaryData*.cpp
+JuceLibraryCode
+
+#macOS Finder and whatnot
+.DS_Store
+*.DS_Store
+*.swp
+*~
+
+/cmake-build-debug/
+/x-build/
+/.idea/
+/.vs/
+/out/
+/CMakeSettings.json
