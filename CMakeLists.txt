@@ -7,7 +7,8 @@ add_subdirectory(JUCE) # Use our patched JUCE 6.1.6, which skips the unset(xxx) 
 juce_add_plugin(Moses
     COMPANY_NAME Juce-Dev                       # Specify the name of the plugin's author (I put Juce-Dev to have my dev VST grouped together)
     IS_SYNTH FALSE                              # Is this a synth or an effect?
-    NEEDS_MIDI_INPUT FALSE                       # Does the plugin need midi input?
+    IS_EFFECT TRUE                              # Is this plugin an effect?
+    NEEDS_MIDI_INPUT FALSE                      # Does the plugin need midi input?
     NEEDS_MIDI_OUTPUT FALSE                     # Does the plugin need midi output?
     IS_MIDI_EFFECT FALSE                        # Is this plugin a MIDI effect?
     COPY_PLUGIN_AFTER_BUILD TRUE                # Should the plugin be installed to a default location after building?

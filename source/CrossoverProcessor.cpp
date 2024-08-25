@@ -3,19 +3,51 @@
 //
 
 #include "CrossoverProcessor.h"
-void CrossoverProcessor::prepare(const juce::dsp::ProcessSpec &spec) {
+CrossoverProcessor::CrossoverProcessor() {
     for (int i = 0; i < 4; ++i)
     {
+        lowPassFilters[i] = std::make_unique<juce::dsp::LinkwitzRileyFilter<float>>();
+        lowPassFilters[i]->setType(juce::dsp::LinkwitzRileyFilterType::lowpass);
+        highPassFilters[i] = std::make_unique<juce::dsp::LinkwitzRileyFilter<float> >();
+        highPassFilters[i]->setType(juce::dsp::LinkwitzRileyFilterType::highpass);
+        allPassFilters[i] = std::make_unique<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>>();
+    }
+}
+
+void CrossoverProcessor::prepare(const juce::dsp::ProcessSpec& spec) {
+    numChannelsPrepared = spec.numChannels;
+
+    for (int i = 0; i < 4; ++i) {
         lowPassFilters[i]->prepare(spec);
         highPassFilters[i]->prepare(spec);
+        allPassFilters[i]->reset();
         allPassFilters[i]->prepare(spec);
     }
 
     updateFilters();
 }
 
+
+void CrossoverProcessor::updateFilters() const {
+    float crossoverFrequencies[4] = { 200.0f, 800.0f, 3000.0f, 8000.0f };
+
+    for (int i = 0; i < 4; ++i)
+    {
+        lowPassFilters[i]->setCutoffFrequency(crossoverFrequencies[i]);
+        highPassFilters[i]->setCutoffFrequency(crossoverFrequencies[i]);
+        allPassFilters[i]->state = juce::dsp::IIR::Coefficients<float>::makeAllPass(48000.0, crossoverFrequencies[i]);
+    }
+}
+
 void CrossoverProcessor::process(juce::AudioBuffer<float> &buffer) {
     juce::dsp::AudioBlock<float> block(buffer);
+
+    // Vérification de cohérence
+    if (block.getNumChannels() != numChannelsPrepared) {
+        DBG("Channel mismatch: Block Channels = " << block.getNumChannels() << ", Prepared Channels = " << numChannelsPrepared);
+        jassertfalse; // Arrêtez ici si les canaux ne correspondent pas
+        return;
+    }
 
     juce::dsp::AudioBlock<float> highBand3(block), highBand2(block), lowBand2(block);
     juce::dsp::AudioBlock<float> lowBand1(block), highBand1(block);
@@ -39,6 +71,15 @@ void CrossoverProcessor::process(juce::AudioBuffer<float> &buffer) {
         juce::FloatVectorOperations::add(buffer.getWritePointer(channel), lowBand2.getChannelPointer(channel), buffer.getNumSamples());
         juce::FloatVectorOperations::add(buffer.getWritePointer(channel), lowBand1.getChannelPointer(channel), buffer.getNumSamples());
         juce::FloatVectorOperations::add(buffer.getWritePointer(channel), highBand1.getChannelPointer(channel), buffer.getNumSamples());
+    }
+}
+
+void CrossoverProcessor::reset() const {
+    for (int i = 0; i < 4; ++i)
+    {
+        lowPassFilters[i]->reset();
+        highPassFilters[i]->reset();
+        allPassFilters[i]->reset();
     }
 }
 

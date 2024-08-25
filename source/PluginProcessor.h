@@ -14,6 +14,7 @@ public:
 
     void reset() override;
 
+#pragma region JUCE Boilerplate
     //JUCE
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
 
@@ -41,6 +42,8 @@ public:
     void getStateInformation(juce::MemoryBlock &destData) override;
     void setStateInformation(const void *data, int sizeInBytes) override;
     //end JUCE
+#pragma endregion
+
     juce::AudioProcessorValueTreeState& getAPVTS();
 
 private:

@@ -3,12 +3,15 @@
 #include "PluginEditor.h"
 
 PluginProcessor::PluginProcessor()
-    : AudioProcessor(
-          BusesProperties().withInput("Input", juce::AudioChannelSet::stereo(), true)),
+    : AudioProcessor(BusesProperties()
+          .withInput("Input", juce::AudioChannelSet::stereo(), true)
+          .withOutput("Output", juce::AudioChannelSet::stereo(), true)
+          ),
       mAPVTS(*this, nullptr, "PARAMETERS", createParameters())
 {
     mAPVTS.state.addListener(this);
 }
+
 
 void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
@@ -17,13 +20,42 @@ void PluginProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = getMainBusNumOutputChannels();
 
+    if (spec.numChannels == 0)
+    {
+        // Si numChannels est 0, ne pas préparer les filtres pour éviter les erreurs.
+        DBG("Error: numChannels is 0, delaying filter preparation.");
+        return;
+    }
+
     crossover.prepare(spec);
 }
 
-void PluginProcessor::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &)
+
+void PluginProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
+    // Vérifiez si les filtres ont été préparés avec un nombre de canaux valide.
+    if (crossover.getNumChannelsPrepared() == 0)
+    {
+        // Si les filtres ne sont pas encore préparés et qu'on a maintenant des canaux valides, on prépare les filtres.
+        if (buffer.getNumChannels() > 0)
+        {
+            juce::dsp::ProcessSpec spec;
+            spec.sampleRate = getSampleRate();
+            spec.maximumBlockSize = buffer.getNumSamples();
+            spec.numChannels = buffer.getNumChannels();
+
+            crossover.prepare(spec);
+        }
+        else
+        {
+            // Pas de traitement si le buffer n'a pas de canaux audio (pas de sortie connectée)
+            return;
+        }
+    }
+
     crossover.process(buffer);
 }
+
 
 void PluginProcessor::reset()
 {
@@ -131,20 +163,11 @@ juce::AudioProcessorEditor* PluginProcessor::createEditor()
 
 bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-#if JucePlugin_IsMidiEffect
-    juce::ignoreUnused (layouts);
-    return true;
-#else
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
      && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
-#if ! JucePlugin_IsSynth
-    if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
-        return false;
-#endif
 
     return true;
-#endif
 }
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
