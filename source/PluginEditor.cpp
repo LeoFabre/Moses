@@ -8,7 +8,7 @@ PluginEditor::PluginEditor(PluginProcessor &p)
 {
 
     createSliders();
-    setSize(800, 600);
+    setSize(800, 300);
 }
 
 
@@ -21,15 +21,15 @@ void PluginEditor::paint(juce::Graphics &g) {
 
 void PluginEditor::resized()
 {
-    auto area = getLocalBounds();
-    int sliderHeight = area.getHeight() / (numBands + (numBands - 1));  // Calculer la hauteur pour chaque slider
+    auto area = getLocalBounds().removeFromBottom(getHeight() / 2);
+    int sliderWidth = area.getWidth() / (numBands + (numBands - 1));
 
     for (int i = 0; i < numBands; ++i)
     {
-        gainSliders[i]->setBounds(area.removeFromTop(sliderHeight));
+        gainSliders[i]->setBounds(area.removeFromLeft(sliderWidth));
         if (i < numBands - 1)
         {
-            freqSliders[i]->setBounds(area.removeFromTop(sliderHeight));
+            freqSliders[i]->setBounds(area.removeFromLeft(sliderWidth));
         }
     }
 }
