@@ -97,6 +97,8 @@ MultiBandCompressorAudioProcessorEditor::MultiBandCompressorAudioProcessorEditor
         slBandGain[i].setTextBoxStyle(juce::Slider::TextBoxBelow, false, 70, 12);
         slBandGain[i].setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::cornflowerblue);
         slBandGain[i].setTextValueSuffix(" dB");
+        slBandGain[i].setName("gain" + juce::String(i));
+        slBandGain[i].addListener(this);
         addAndMakeVisible(&slBandGain[i]);
     }
 

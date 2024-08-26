@@ -92,11 +92,13 @@ MultiBandCompressorAudioProcessor::MultiBandCompressorAudioProcessor() :
         }
 
         const juce::String soloID ("solo" + juce::String (filterBandIdx));
+        const juce::String killID ("kill" + juce::String (filterBandIdx));
         const juce::String gainID ("gain" + juce::String (filterBandIdx));
 
         gain[filterBandIdx] = parameters.getRawParameterValue(gainID);
 
         parameters.addParameterListener (soloID, this);
+        parameters.addParameterListener (killID, this);
         parameters.addParameterListener(gainID, this);
     }
 
@@ -203,6 +205,10 @@ std::vector<std::unique_ptr<juce::RangedAudioParameter>>
     {
         auto boolParam = std::make_unique<juce::AudioParameterBool> ("solo" + juce::String (i),
                                                                 "Solo band " + juce::String (i),
+                                                                false);
+        params.push_back (std::move (boolParam));
+        boolParam = std::make_unique<juce::AudioParameterBool> ("kill" + juce::String (i),
+                                                                "Kill band " + juce::String (i),
                                                                 false);
         params.push_back (std::move (boolParam));
     }
@@ -670,7 +676,8 @@ void MultiBandCompressorAudioProcessor::parameterChanged (const juce::String& pa
     }
     else if (parameterID.startsWith ("gain"))
     {
-        gain[parameterID.getLastCharacters(1).getIntValue()]->store(newValue);
+        const int bandId = parameterID.getLastCharacters (1).getIntValue();
+        gain[bandId]->store(newValue);
         repaintFilterVisualization = true;
     }
     else
