@@ -16,6 +16,8 @@ CrossoverProcessor::CrossoverProcessor() {
 
 void CrossoverProcessor::prepare(const juce::dsp::ProcessSpec& spec) {
     numChannelsPrepared = spec.numChannels;
+    sampleRate = spec.sampleRate;  // Stocker la fréquence d'échantillonnage
+
 
     for (int i = 0; i < 4; ++i) {
         lowPassFilters[i]->prepare(spec);
@@ -35,7 +37,7 @@ void CrossoverProcessor::updateFilters() const {
     {
         lowPassFilters[i]->setCutoffFrequency(crossoverFrequencies[i]);
         highPassFilters[i]->setCutoffFrequency(crossoverFrequencies[i]);
-        allPassFilters[i]->state = juce::dsp::IIR::Coefficients<float>::makeAllPass(48000.0, crossoverFrequencies[i]);
+        allPassFilters[i]->state = juce::dsp::IIR::Coefficients<float>::makeAllPass(sampleRate, crossoverFrequencies[i]);
     }
 }
 

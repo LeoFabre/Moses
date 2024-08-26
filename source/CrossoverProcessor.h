@@ -25,5 +25,5 @@ private:
     std::unique_ptr<juce::dsp::LinkwitzRileyFilter<float>> highPassFilters[4];
     std::unique_ptr<juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>> allPassFilters[4];
     size_t numChannelsPrepared = 0;
-
+    double sampleRate;
 };
