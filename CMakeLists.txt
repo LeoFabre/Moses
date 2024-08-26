@@ -45,6 +45,7 @@ target_link_libraries(Moses
         juce::juce_audio_processors
         juce::juce_gui_basics
         juce::juce_dsp
+        juce::juce_osc
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_warning_flags)
