@@ -101,24 +101,11 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
         soloAttachment[numFilterBands], bypassAttachment[numFilterBands];
 
-    // Compressor Parameters
-    ReverseSlider slKnee[numFilterBands], slThreshold[numFilterBands], slRatio[numFilterBands],
-        slAttackTime[numFilterBands], slReleaseTime[numFilterBands], slMakeUpGain[numFilterBands];
-    std::unique_ptr<SliderAttachment> slKneeAttachment[numFilterBands],
-        slThresholdAttachment[numFilterBands], slRatioAttachment[numFilterBands],
-        slAttackTimeAttachment[numFilterBands], slReleaseTimeAttachment[numFilterBands],
-        slMakeUpGainAttachment[numFilterBands];
+    // Band gain sliders
+    ReverseSlider slBandGain[numFilterBands];
+    std::unique_ptr<SliderAttachment> slBandGainAttachment[numFilterBands];
 
-    // Master parameters
-    juce::GroupComponent gcMasterControls;
-    MasterControl slMasterThreshold, slMasterMakeUpGain, slMasterKnee, slMasterRatio,
-        slMasterAttackTime, slMasterReleaseTime;
-
-    // Compressor Visualization
-    juce::OwnedArray<CompressorVisualizer> compressorVisualizers;
-
-    // Meters
-    LevelMeter GRmeter[numFilterBands], omniInputMeter, omniOutputMeter;
+    LevelMeter omniInputMeter, omniOutputMeter;
 
     // juce::Toggle juce::Buttons
     juce::ToggleButton tbOverallMagnitude;

@@ -106,13 +106,11 @@ public:
 
     juce::Atomic<bool> characteristicHasChanged[numFilterBands];
 
-    iem::Compressor* getCompressor (const int i) { return &compressors[i]; };
-
 private:
-    void calculateCoefficients (const int index);
+    void calculateCoefficients (int index);
     void copyCoeffsToProcessor();
 
-    inline void clear (juce::dsp::AudioBlock<IIRfloat>& ab);
+    inline void clear (AudioBlock<IIRfloat>& ab);
 
     double lastSampleRate { 48000 };
     const int maxNumFilters;
@@ -120,17 +118,9 @@ private:
     // list of used audio parameters
     std::atomic<float>* orderSetting;
     std::atomic<float>* crossovers[numFilterBands - 1];
-    std::atomic<float>* threshold[numFilterBands];
-    std::atomic<float>* knee[numFilterBands];
-    std::atomic<float>* makeUpGain[numFilterBands];
-    std::atomic<float>* ratio[numFilterBands];
-    std::atomic<float>* attack[numFilterBands];
-    std::atomic<float>* release[numFilterBands];
-    std::atomic<float>* bypass[numFilterBands];
+    std::atomic<float>* gain[numFilterBands];
 
     juce::BigInteger soloArray;
-
-    iem::Compressor compressors[numFilterBands];
 
     // filter coefficients
     juce::dsp::IIR::Coefficients<float>::Ptr iirLPCoefficients[numFilterBands - 1],

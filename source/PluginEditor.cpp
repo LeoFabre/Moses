@@ -62,100 +62,6 @@ MultiBandCompressorAudioProcessorEditor::MultiBandCompressorAudioProcessorEditor
 
     for (int i = 0; i < numFilterBands; ++i)
     {
-        // ==== COMPRESSOR VISUALIZATION ====
-        compressorVisualizers.add (new CompressorVisualizer (p.getCompressor (i)));
-        addAndMakeVisible (compressorVisualizers[i]);
-
-        // ===== GR METERS =====
-        addAndMakeVisible (&GRmeter[i]);
-        GRmeter[i].setMinLevel (-25.0f);
-        GRmeter[i].setColour (juce::Colours::red.withMultipliedAlpha (0.8f));
-        GRmeter[i].setGainReductionMeter (true);
-
-        // ==== SLIDERS ====
-        addAndMakeVisible (&slThreshold[i]);
-        slThresholdAttachment[i] =
-            std::make_unique<SliderAttachment> (valueTreeState,
-                                                "threshold" + juce::String (i),
-                                                slThreshold[i]);
-        slThreshold[i].setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
-        slThreshold[i].setTextBoxStyle (juce::Slider::TextBoxBelow, false, 50, 12);
-        slThreshold[i].setColour (juce::Slider::rotarySliderOutlineColourId, colours[i]);
-        slThreshold[i].setTextValueSuffix (" dB");
-
-        addAndMakeVisible (&slKnee[i]);
-        slKneeAttachment[i] = std::make_unique<SliderAttachment> (valueTreeState,
-                                                                  "knee" + juce::String (i),
-                                                                  slKnee[i]);
-        slKnee[i].setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
-        slKnee[i].setTextBoxStyle (juce::Slider::TextBoxBelow, false, 50, 12);
-        slKnee[i].setColour (juce::Slider::rotarySliderOutlineColourId, colours[i]);
-        slKnee[i].setTextValueSuffix (" dB");
-
-        addAndMakeVisible (&slRatio[i]);
-        slRatioAttachment[i] = std::make_unique<SliderAttachment> (valueTreeState,
-                                                                   "ratio" + juce::String (i),
-                                                                   slRatio[i]);
-        slRatio[i].setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
-        slRatio[i].setTextBoxStyle (juce::Slider::TextBoxBelow, false, 50, 12);
-        slRatio[i].setColour (juce::Slider::rotarySliderOutlineColourId, colours[i]);
-
-        addAndMakeVisible (&slAttackTime[i]);
-        slAttackTimeAttachment[i] = std::make_unique<SliderAttachment> (valueTreeState,
-                                                                        "attack" + juce::String (i),
-                                                                        slAttackTime[i]);
-        slAttackTime[i].setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
-        slAttackTime[i].setTextBoxStyle (juce::Slider::TextBoxBelow, false, 50, 12);
-        slAttackTime[i].setColour (juce::Slider::rotarySliderOutlineColourId, colours[i]);
-        slRatio[i].setTextValueSuffix (" ms");
-
-        addAndMakeVisible (&slReleaseTime[i]);
-        slReleaseTimeAttachment[i] =
-            std::make_unique<SliderAttachment> (valueTreeState,
-                                                "release" + juce::String (i),
-                                                slReleaseTime[i]);
-        slReleaseTime[i].setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
-        slReleaseTime[i].setTextBoxStyle (juce::Slider::TextBoxBelow, false, 50, 12);
-        slReleaseTime[i].setColour (juce::Slider::rotarySliderOutlineColourId, colours[i]);
-        slReleaseTime[i].setTextValueSuffix (" ms");
-
-        addAndMakeVisible (&slMakeUpGain[i]);
-        slMakeUpGainAttachment[i] =
-            std::make_unique<SliderAttachment> (valueTreeState,
-                                                "makeUpGain" + juce::String (i),
-                                                slMakeUpGain[i]);
-        slMakeUpGain[i].setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
-        slMakeUpGain[i].setTextBoxStyle (juce::Slider::TextBoxBelow, false, 50, 12);
-        slMakeUpGain[i].setColour (juce::Slider::rotarySliderOutlineColourId, colours[i]);
-        slMakeUpGain[i].setTextValueSuffix (" dB");
-        slMakeUpGain[i].setName (juce::String ("MakeUpGain" + juce::String (i)));
-        slMakeUpGain[i].addListener (this);
-
-        // ===== LABELS =====
-        addAndMakeVisible (&lbKnee[i]);
-        lbKnee[i].setText ("Knee");
-        lbKnee[i].setTextColour (globalLaF.ClFace);
-
-        addAndMakeVisible (&lbThreshold[i]);
-        lbThreshold[i].setText ("Threshold");
-        lbThreshold[i].setTextColour (globalLaF.ClFace);
-
-        addAndMakeVisible (&lbMakeUpGain[i]);
-        lbMakeUpGain[i].setText ("Makeup");
-        lbMakeUpGain[i].setTextColour (globalLaF.ClFace);
-
-        addAndMakeVisible (&lbRatio[i]);
-        lbRatio[i].setText ("Ratio");
-        lbRatio[i].setTextColour (globalLaF.ClFace);
-
-        addAndMakeVisible (&lbAttack[i]);
-        lbAttack[i].setText ("Attack");
-        lbAttack[i].setTextColour (globalLaF.ClFace);
-
-        addAndMakeVisible (&lbRelease[i]);
-        lbRelease[i].setText ("Release");
-        lbRelease[i].setTextColour (globalLaF.ClFace);
-
         // ==== BUTTONS ====
         tbSolo[i].setColour (juce::ToggleButton::tickColourId,
                              juce::Colour (0xFFFFFF66).withMultipliedAlpha (0.85f));
@@ -172,19 +78,26 @@ MultiBandCompressorAudioProcessorEditor::MultiBandCompressorAudioProcessorEditor
         addAndMakeVisible (&tbSolo[i]);
 
         tbBypass[i].setColour (juce::ToggleButton::tickColourId,
-                               juce::Colour (0xFF5bAE87).withMultipliedAlpha (0.85f));
+                               juce::Colour (juce::Colours::red).withMultipliedAlpha (0.85f));
         tbBypass[i].setScaleFontSize (0.75f);
-        tbBypass[i].setButtonText ("B");
-        tbBypass[i].setName ("bypass" + juce::String (i));
-        tbBypass[i].setTooltip ("Bypass band #" + juce::String (i));
+        tbBypass[i].setButtonText ("K");
+        tbBypass[i].setName ("kill" + juce::String (i));
+        tbBypass[i].setTooltip ("Kill band #" + juce::String (i));
         bypassAttachment[i] =
             std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment> (
                 valueTreeState,
-                "bypass" + juce::String (i),
+                "kill" + juce::String (i),
                 tbBypass[i]);
         tbBypass[i].setClickingTogglesState (true);
         tbBypass[i].addListener (this);
         addAndMakeVisible (&tbBypass[i]);
+
+        slBandGainAttachment[i] = std::make_unique<SliderAttachment>(valueTreeState, "gain" + juce::String(i), slBandGain[i]);
+        slBandGain[i].setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+        slBandGain[i].setTextBoxStyle(juce::Slider::TextBoxBelow, false, 70, 12);
+        slBandGain[i].setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::cornflowerblue);
+        slBandGain[i].setTextValueSuffix(" dB");
+        addAndMakeVisible(&slBandGain[i]);
     }
 
     // ==== FILTER VISUALIZATION ====
@@ -215,7 +128,7 @@ MultiBandCompressorAudioProcessorEditor::MultiBandCompressorAudioProcessorEditor
         filterBankVisualizer.setFrequencyBand (i, coeffs1, coeffs2, colours[i]);
         filterBankVisualizer.setBypassed (i, tbBypass[i].getToggleState());
         filterBankVisualizer.setSolo (i, tbSolo[i].getToggleState());
-        filterBankVisualizer.updateMakeUpGain (i, slMakeUpGain[i].getValue());
+        filterBankVisualizer.updateMakeUpGain (i, slBandGain[i].getValue());
     }
 
     addAndMakeVisible (&filterBankVisualizer);
@@ -264,57 +177,6 @@ MultiBandCompressorAudioProcessorEditor::MultiBandCompressorAudioProcessorEditor
     addAndMakeVisible (&lbOutput);
     lbOutput.setText ("Output");
     lbOutput.setTextColour (globalLaF.ClFace);
-
-    // ==== MASTER CONTROLS ====
-    addAndMakeVisible (&slMasterThreshold);
-    slMasterThreshold.setName ("MasterThreshold");
-    addAndMakeVisible (&lbThreshold[numFilterBands]);
-    lbThreshold[numFilterBands].setText ("Thresh.");
-    lbThreshold[numFilterBands].setTextColour (globalLaF.ClFace);
-
-    addAndMakeVisible (&slMasterKnee);
-    slMasterKnee.setName ("MasterKnee");
-    addAndMakeVisible (&lbKnee[numFilterBands]);
-    lbKnee[numFilterBands].setText ("Knee");
-    lbKnee[numFilterBands].setTextColour (globalLaF.ClFace);
-
-    addAndMakeVisible (&slMasterMakeUpGain);
-    slMasterMakeUpGain.setName ("MasterMakeUpGain");
-    addAndMakeVisible (&lbMakeUpGain[numFilterBands]);
-    lbMakeUpGain[numFilterBands].setText ("Gain");
-    lbMakeUpGain[numFilterBands].setTextColour (globalLaF.ClFace);
-
-    addAndMakeVisible (&slMasterRatio);
-    slMasterRatio.setName ("MasterMakeUpGain");
-    addAndMakeVisible (&lbRatio[numFilterBands]);
-    lbRatio[numFilterBands].setText ("Ratio");
-    lbRatio[numFilterBands].setTextColour (globalLaF.ClFace);
-
-    addAndMakeVisible (&slMasterAttackTime);
-    slMasterAttackTime.setName ("MasterAttackTime");
-    addAndMakeVisible (&lbAttack[numFilterBands]);
-    lbAttack[numFilterBands].setText ("Attack");
-    lbAttack[numFilterBands].setTextColour (globalLaF.ClFace);
-
-    addAndMakeVisible (&slMasterReleaseTime);
-    slMasterReleaseTime.setName ("MasterReleaseTime");
-    addAndMakeVisible (&lbRelease[numFilterBands]);
-    lbRelease[numFilterBands].setText ("Rel.");
-    lbRelease[numFilterBands].setTextColour (globalLaF.ClFace);
-
-    gcMasterControls.setText ("Master controls");
-    addAndMakeVisible (&gcMasterControls);
-
-    // add sliders to master controls
-    for (int i = 0; i < numFilterBands; ++i)
-    {
-        slMasterThreshold.addSlave (slThreshold[i]);
-        slMasterKnee.addSlave (slKnee[i]);
-        slMasterMakeUpGain.addSlave (slMakeUpGain[i]);
-        slMasterRatio.addSlave (slRatio[i]);
-        slMasterAttackTime.addSlave (slAttackTime[i]);
-        slMasterReleaseTime.addSlave (slReleaseTime[i]);
-    }
 
     /* resized () is called here, because otherwise the compressorVisualizers won't be drawn to the GUI until one manually resizes the window.
     It seems resized() somehow gets called *before* the constructor and therefore juce::OwnedArray<CompressorVisualizers> is still empty on the first resized call... */
@@ -441,6 +303,7 @@ void MultiBandCompressorAudioProcessorEditor::resized()
         ((compressorArea.getWidth() - (numFilterBands - 1) * bandToBandGap) / numFilterBands);
     juce::Rectangle<int> characteristicArea, paramArea, paramRow1, paramRow2, labelRow1, labelRow2,
         grMeterArea;
+    juce::Rectangle<int> gainSliderArea;
 
     for (int i = 0; i < numFilterBands; ++i)
     {
@@ -462,31 +325,17 @@ void MultiBandCompressorAudioProcessorEditor::resized()
         labelRow1 = paramRow1.removeFromBottom (paramRow1.proportionOfHeight (labelToParamRatio));
         labelRow2 = paramRow2.removeFromBottom (paramRow2.proportionOfHeight (labelToParamRatio));
 
-        lbThreshold[i].setBounds (labelRow1.removeFromLeft (sliderWidth));
-        lbKnee[i].setBounds (labelRow1.removeFromLeft (sliderWidth));
-        lbMakeUpGain[i].setBounds (labelRow1.removeFromLeft (sliderWidth));
-        slThreshold[i].setBounds (paramRow1.removeFromLeft (sliderWidth));
-        slKnee[i].setBounds (paramRow1.removeFromLeft (sliderWidth));
-        slMakeUpGain[i].setBounds (paramRow1.removeFromLeft (sliderWidth));
+        // Gain-Reduction meter (will make a band meter later out of this)
+        // grMeterArea = characteristicArea.removeFromRight (
+        //     characteristicArea.proportionOfWidth (meterToCharacteristicRatio));
+        // grMeterArea.removeFromLeft (meterToCharacteristicGap / 2);
+        // characteristicArea.removeFromRight (meterToCharacteristicGap / 2);
+        // GRmeter[i].setBounds (
+        //     grMeterArea.reduced (0, grMeterArea.proportionOfHeight (trimMeterHeightRatio)));
 
-        lbRatio[i].setBounds (labelRow2.removeFromLeft (sliderWidth));
-        lbAttack[i].setBounds (labelRow2.removeFromLeft (sliderWidth));
-        lbRelease[i].setBounds (labelRow2.removeFromLeft (sliderWidth));
-        slRatio[i].setBounds (paramRow2.removeFromLeft (sliderWidth));
-        slAttackTime[i].setBounds (paramRow2.removeFromLeft (sliderWidth));
-        slReleaseTime[i].setBounds (paramRow2.removeFromLeft (sliderWidth));
 
-        // Gain-Reduction meter
-        grMeterArea = characteristicArea.removeFromRight (
-            characteristicArea.proportionOfWidth (meterToCharacteristicRatio));
-        grMeterArea.removeFromLeft (meterToCharacteristicGap / 2);
-        characteristicArea.removeFromRight (meterToCharacteristicGap / 2);
-        GRmeter[i].setBounds (
-            grMeterArea.reduced (0, grMeterArea.proportionOfHeight (trimMeterHeightRatio)));
-
-        // Compressor characteristic
-        if (! (compressorVisualizers.isEmpty()))
-            compressorVisualizers[i]->setBounds (characteristicArea);
+        // gainSliderArea = compressorArea.removeFromTop(150);  // Ajustez sliderHeight en fonction de votre disposition
+        slBandGain[i].setBounds(characteristicArea.reduced(10,10));
 
         if (i < numFilterBands - 1)
             compressorArea.removeFromLeft (bandToBandGap);
@@ -525,36 +374,21 @@ void MultiBandCompressorAudioProcessorEditor::resized()
     juce::Rectangle<int> masterArea =
         rightArea.removeFromBottom (rightArea.proportionOfHeight (masterToUpperArea));
     masterArea.removeFromLeft (masterToCompressorSectionGap);
-    gcMasterControls.setBounds (masterArea);
     masterArea.removeFromTop (trimFromGroupComponentHeader);
 
     juce::Rectangle<int> sliderRow =
         masterArea.removeFromTop (masterArea.proportionOfHeight (0.5f));
-    //    sliderRow.reduce (sliderRow.proportionOfWidth (trimSliderWidth), sliderRow.proportionOfHeight (trimSliderHeight));
+    sliderRow.reduce (sliderRow.proportionOfWidth (trimSliderWidth), sliderRow.proportionOfHeight (trimSliderHeight));
     juce::Rectangle<int> labelRow =
         sliderRow.removeFromBottom (sliderRow.proportionOfHeight (labelToSliderRatio));
 
     const int masterSliderWidth = 35;
     DBG (sliderRow.getWidth());
 
-    slMasterThreshold.setBounds (sliderRow.removeFromLeft (masterSliderWidth));
-    slMasterKnee.setBounds (sliderRow.removeFromLeft (masterSliderWidth));
-    slMasterMakeUpGain.setBounds (sliderRow.removeFromLeft (masterSliderWidth));
-    lbThreshold[numFilterBands].setBounds (labelRow.removeFromLeft (masterSliderWidth));
-    lbKnee[numFilterBands].setBounds (labelRow.removeFromLeft (masterSliderWidth));
-    lbMakeUpGain[numFilterBands].setBounds (labelRow.removeFromLeft (masterSliderWidth));
-
     sliderRow = masterArea;
     sliderRow.reduce (sliderRow.proportionOfWidth (trimSliderWidth),
                       sliderRow.proportionOfHeight (trimSliderHeight));
     labelRow = sliderRow.removeFromBottom (sliderRow.proportionOfHeight (labelToSliderRatio));
-
-    slMasterRatio.setBounds (sliderRow.removeFromLeft (masterSliderWidth));
-    slMasterAttackTime.setBounds (sliderRow.removeFromLeft (masterSliderWidth));
-    slMasterReleaseTime.setBounds (sliderRow.removeFromLeft (masterSliderWidth));
-    lbRatio[numFilterBands].setBounds (labelRow.removeFromLeft (masterSliderWidth));
-    lbAttack[numFilterBands].setBounds (labelRow.removeFromLeft (masterSliderWidth));
-    lbRelease[numFilterBands].setBounds (labelRow.removeFromLeft (masterSliderWidth));
 
     // ==== FILTERBANKVISUALIZER SETTINGS ====
     const float trimHeight = 0.4f;
@@ -569,7 +403,7 @@ void MultiBandCompressorAudioProcessorEditor::resized()
 
 void MultiBandCompressorAudioProcessorEditor::sliderValueChanged (juce::Slider* slider)
 {
-    if (slider->getName().startsWith ("MakeUpGain"))
+    if (slider->getName().startsWith ("gain"))
     {
         filterBankVisualizer.updateMakeUpGain (
             slider->getName().getLastCharacters (1).getIntValue(),
@@ -580,7 +414,7 @@ void MultiBandCompressorAudioProcessorEditor::sliderValueChanged (juce::Slider* 
 
 void MultiBandCompressorAudioProcessorEditor::buttonClicked (juce::Button* button)
 {
-    if (button->getName().startsWith ("bypass"))
+    if (button->getName().startsWith ("kill"))
     {
         int i = button->getName().getLastCharacters (1).getIntValue();
         filterBankVisualizer.setBypassed (i, button->getToggleState());
@@ -620,15 +454,13 @@ void MultiBandCompressorAudioProcessorEditor::timerCallback()
         const auto gainReduction = processor.maxGR[i].get();
 
         filterBankVisualizer.updateGainReduction (i, gainReduction);
-        compressorVisualizers[i]->setMarkerLevels (processor.maxPeak[i].get(), gainReduction);
 
         if (processor.characteristicHasChanged[i].get())
         {
-            compressorVisualizers[i]->updateCharacteristic();
             processor.characteristicHasChanged[i] = false;
         }
 
-        GRmeter[i].setLevel (gainReduction);
+        // GRmeter[i].setLevel (gainReduction);
     }
 
     if (displayOverallMagnitude)
