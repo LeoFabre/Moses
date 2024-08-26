@@ -29,14 +29,12 @@
 #include "Components/TitleBar.h"
 
 //Custom juce::Components
-#include "Components/CompressorVisualizer.h"
 #include "Components/FilterVisualizer.h"
 #include "Components/LevelMeter.h"
 #include "Components/ReverseSlider.h"
 #include "Components/RoundButton.h"
 #include "Components/SimpleLabel.h"
 #include "FilterBankVisualizer.h"
-#include "MasterControl.h"
 
 using SliderAttachment = ReverseSlider::
     SliderAttachment; // all ReverseSliders will make use of the parameters' valueToText() function
