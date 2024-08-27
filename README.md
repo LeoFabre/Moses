@@ -1,20 +1,26 @@
 # WORK IN PROGRESS - Moses - CMake, JUCE 6.1.6, ElkPi
-This is a JUCE-based VST3 crossover that I'm making for my dub sound system control tower. 
+This is a JUCE-based crossover audio plugin that I'm making for my dub sound system control tower. 
+It is based on [IEMPluginSuite](https://git.iem.at/audioplugins/IEMPluginSuite)'s IEMMultiBandCompressor, but with a different goal and a different set of features.
 
-Its goal is to provide a simple and efficient way to cut and gainstage the input audio across 5 frequency bands.  
+Its goal is to provide a simple and efficient way to cut and gainstage the input audio across 4 frequency bands.  
 It is made for a control panel that features the controls needed.
 
-I originally had a preamp with a 6-band crossover, but I wanted to have a more flexible and efficient way to control the sound,
+I originally had an analog preamp with a 6-band crossover, but I wanted to have a more flexible and efficient way to control the sound,
 and most importantly, have clean filters and phase coherence - which analog crossovers don't always provide.
 (+ my crossover was mono only, and its sub bass controls were not working on the full range output, they were merged with the bass controls)
 
 Please feel free to contribute by opening a PR or an issue.
 
 # Features (planned)
-- 5-band crossover using Linkwitz-riley filters (24dB/octave) with adjustable frequencies and gains, and a kill switch
-- OSC controls for all parameters
-- MIDI controls for all parameters
-- ???
+- 4-band SIMD optimized crossover using cascaded Butterworth, linkwitz-riley filters and Allpass filters
+- Adjustable crossover frequencies
+- Solo and Kill switches for each band
+- OSC and MIDI controls for all parameters
+- Filter phase coherence
+- Clean filters
+- Filters visualization
+- Input and output gain visualization
+- Input and output waveform visualization
 
 # User Documentation
 Soon come bredda ;)
