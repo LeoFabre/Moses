@@ -57,6 +57,7 @@ MultiBandCompressorAudioProcessorEditor::MultiBandCompressorAudioProcessorEditor
 
     const juce::Colour colours[numFilterBands] = { juce::Colours::cornflowerblue,
                                                    juce::Colours::greenyellow,
+                                                   juce::Colours::purple,
                                                    juce::Colours::yellow,
                                                    juce::Colours::orangered };
 
@@ -117,12 +118,16 @@ MultiBandCompressorAudioProcessorEditor::MultiBandCompressorAudioProcessorEditor
                 coeffs1 = processor.lowPassLRCoeffs[1];
                 coeffs2 = processor.highPassLRCoeffs[0];
                 break;
-            case (int) MultiBandCompressorAudioProcessor::FrequencyBands::MidHigh:
+            case (int) MultiBandCompressorAudioProcessor::FrequencyBands::Mid:
                 coeffs1 = processor.highPassLRCoeffs[1];
                 coeffs2 = processor.lowPassLRCoeffs[2];
                 break;
+            case (int) MultiBandCompressorAudioProcessor::FrequencyBands::MidHigh:
+                coeffs1 = processor.lowPassLRCoeffs[3];
+                coeffs2 = processor.highPassLRCoeffs[2];
+                break;
             case (int) MultiBandCompressorAudioProcessor::FrequencyBands::High:
-                coeffs1 = processor.highPassLRCoeffs[1];
+                coeffs1 = processor.highPassLRCoeffs[3];
                 coeffs2 = processor.highPassLRCoeffs[2];
                 break;
         }
