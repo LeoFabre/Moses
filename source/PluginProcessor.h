@@ -37,11 +37,11 @@ using namespace juce::dsp;
 using ParameterLayout = juce::AudioProcessorValueTreeState::ParameterLayout;
 
 class MultiBandCompressorAudioProcessor
-    : public AudioProcessorBase<IOTypes::Ambisonics<>, IOTypes::Ambisonics<>>
+    : public AudioProcessorBase
 {
 public:
-    constexpr static int numberOfInputChannels = 64;
-    constexpr static int numberOfOutputChannels = 64;
+    constexpr static int numberOfInputChannels = 2;
+    constexpr static int numberOfOutputChannels = 2;
     //==============================================================================
     MultiBandCompressorAudioProcessor();
     ~MultiBandCompressorAudioProcessor();
@@ -73,7 +73,6 @@ public:
 
     //==============================================================================
     void parameterChanged (const juce::String& parameterID, float newValue) override;
-    void updateBuffers() override;
 
     //======= Parameters ===========================================================
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> createParameterLayout();
@@ -129,6 +128,7 @@ private:
     std::atomic<float>* bypass[numFilterBands];
 
     juce::BigInteger soloArray;
+    juce::BigInteger killArray;
 
     iem::Compressor compressors[numFilterBands];
 

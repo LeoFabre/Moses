@@ -185,6 +185,21 @@ MultiBandCompressorAudioProcessorEditor::MultiBandCompressorAudioProcessorEditor
         tbBypass[i].setClickingTogglesState (true);
         tbBypass[i].addListener (this);
         addAndMakeVisible (&tbBypass[i]);
+
+        tbKill[i].setColour (juce::ToggleButton::tickColourId,
+                               juce::Colour (juce::Colours::red).withMultipliedAlpha (0.85f));
+        tbKill[i].setScaleFontSize (0.75f);
+        tbKill[i].setButtonText ("K");
+        tbKill[i].setName ("kill" + juce::String (i));
+        tbKill[i].setTooltip ("Kill band #" + juce::String (i));
+        bypassAttachment[i] =
+            std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment> (
+                valueTreeState,
+                "kill" + juce::String (i),
+                tbKill[i]);
+        tbKill[i].setClickingTogglesState (true);
+        tbKill[i].addListener (this);
+        addAndMakeVisible (&tbKill[i]);
     }
 
     // ==== FILTER VISUALIZATION ====
@@ -404,17 +419,27 @@ void MultiBandCompressorAudioProcessorEditor::resized()
     for (int i = 0; i < numFilterBands; ++i)
     {
         // juce::Buttons
-        bypassButtonArea = crossoverAndButtonArea.removeFromLeft (buttonsWidth);
-        bypassButtonArea.reduce (crossoverToButtonGap / 2, 0);
-        soloButtonArea = bypassButtonArea.removeFromLeft (bypassButtonArea.proportionOfWidth (0.5));
-        soloButtonArea.removeFromRight (buttonToButtonGap / 2);
-        bypassButtonArea.removeFromLeft (buttonToButtonGap / 2);
-        tbSolo[i].setBounds (
-            soloButtonArea.reduced (soloButtonArea.proportionOfWidth (trimButtonsWidth),
-                                    soloButtonArea.proportionOfHeight (trimButtonsHeight)));
-        tbBypass[i].setBounds (
-            bypassButtonArea.reduced (bypassButtonArea.proportionOfWidth (trimButtonsWidth),
-                                      bypassButtonArea.proportionOfHeight (trimButtonsHeight)));
+        // Diviser l'aire en trois parties égales pour les boutons Kill, Solo et Bypass
+        bypassButtonArea = crossoverAndButtonArea.removeFromLeft(buttonsWidth);
+        bypassButtonArea.reduce(crossoverToButtonGap / 2, 0);
+
+        // Création des trois zones pour Kill, Solo et Bypass
+        juce::Rectangle<int> killButtonArea = bypassButtonArea.removeFromLeft(bypassButtonArea.proportionOfWidth(1.0f / 3.0f));
+        juce::Rectangle<int> soloButtonArea = bypassButtonArea.removeFromLeft(bypassButtonArea.proportionOfWidth(0.5f));
+
+        // Ajustement des marges
+        killButtonArea.removeFromRight(buttonToButtonGap / 2);
+        soloButtonArea.removeFromRight(buttonToButtonGap / 2);
+        bypassButtonArea.removeFromLeft(buttonToButtonGap / 2);
+
+        // Assignation des zones aux boutons
+        tbKill[i].setBounds(killButtonArea.reduced(killButtonArea.proportionOfWidth(trimButtonsWidth),
+                                                   killButtonArea.proportionOfHeight(trimButtonsHeight)));
+        tbSolo[i].setBounds(soloButtonArea.reduced(soloButtonArea.proportionOfWidth(trimButtonsWidth),
+                                                   soloButtonArea.proportionOfHeight(trimButtonsHeight)));
+        tbBypass[i].setBounds(bypassButtonArea.reduced(bypassButtonArea.proportionOfWidth(trimButtonsWidth),
+                                                       bypassButtonArea.proportionOfHeight(trimButtonsHeight)));
+
 
         // juce::Sliders
         if (i < numFilterBands - 1)
@@ -603,7 +628,7 @@ void MultiBandCompressorAudioProcessorEditor::buttonClicked (juce::Button* butto
 void MultiBandCompressorAudioProcessorEditor::timerCallback()
 {
     // === update titleBar widgets according to available input/output channel counts
-    title.setMaxSize (processor.getMaxSize());
+    // title.setMaxSize (processor.getMaxSize());
     // ==========================================
 
     if (processor.repaintFilterVisualization.get())

@@ -96,6 +96,7 @@ private:
     std::unique_ptr<SliderAttachment> slCrossoverAttachment[numFilterBands - 1];
 
     // Solo and Bypass juce::Buttons
+    RoundButton tbKill[numFilterBands];
     RoundButton tbSolo[numFilterBands];
     RoundButton tbBypass[numFilterBands];
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>

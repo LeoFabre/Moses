@@ -22,19 +22,15 @@
 
 #pragma once
 
-#include "IOHelper.h"
 #include "juce_osc/juce_osc.h"
 #include "OSC/OSCInputStream.h"
 #include "OSC/OSCParameterInterface.h"
 
 typedef std::vector<std::unique_ptr<juce::RangedAudioParameter>> ParameterList;
 
-template <class inputType, class outputType, bool combined = false>
-
 class AudioProcessorBase : public juce::AudioProcessor,
                            public OSCMessageInterceptor,
                            public juce::VSTCallbackHandler,
-                           public IOHelper<inputType, outputType, combined>,
                            public juce::AudioProcessorValueTreeState::Listener
 {
 public:
