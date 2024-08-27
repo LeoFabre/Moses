@@ -105,6 +105,7 @@ MultiBandCompressorAudioProcessor::MultiBandCompressorAudioProcessor() :
     }
 
     soloArray.clear();
+    killArray.clear();
 
     copyCoeffsToProcessor();
 
@@ -551,6 +552,11 @@ void MultiBandCompressorAudioProcessor::processBlock (juce::AudioSampleBuffer& b
 
     for (int filterBandIdx = 0; filterBandIdx < numFilterBands; ++filterBandIdx)
     {
+        // Vérifier si la bande est en mode Kill
+        if (killArray[filterBandIdx])
+        {
+            continue;  // Si c'est le cas, ne pas l'ajouter au mix final
+        }
         if (!soloArray.isZero())
         {
             if (!soloArray[filterBandIdx])
@@ -690,6 +696,13 @@ void MultiBandCompressorAudioProcessor::parameterChanged (const juce::String& pa
             soloArray.setBit (parameterID.getLastCharacters (1).getIntValue());
         else
             soloArray.clearBit (parameterID.getLastCharacters (1).getIntValue());
+    }
+    else if (parameterID.startsWith("kill"))
+    {
+        if (newValue >= 0.5f)
+            killArray.setBit(parameterID.getLastCharacters(1).getIntValue());
+        else
+            killArray.clearBit(parameterID.getLastCharacters(1).getIntValue());
     }
     else if (parameterID.startsWith ("gain"))
     {

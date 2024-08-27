@@ -118,6 +118,7 @@ private:
     std::atomic<float>* gain[numFilterBands];
 
     juce::BigInteger soloArray;
+    juce::BigInteger killArray;
 
     // filter coefficients
     juce::dsp::IIR::Coefficients<float>::Ptr iirLPCoefficients[numFilterBands - 1],
