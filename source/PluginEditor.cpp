@@ -39,7 +39,7 @@ MultiBandCompressorAudioProcessorEditor::MultiBandCompressorAudioProcessorEditor
 
     // make title and footer visible, and set the PluginName
     addAndMakeVisible (&title);
-    title.setTitle (juce::String ("MultiBand"), juce::String ("Compressor"));
+    title.setTitle (juce::String ("Moses"), "");
     addAndMakeVisible (&footer);
     // ============= END: essentials ========================
 

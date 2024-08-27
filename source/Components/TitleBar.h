@@ -645,7 +645,7 @@ private:
 class Footer : public juce::Component
 {
 public:
-    Footer() : juce::Component() { addAndMakeVisible (&iemLogo); }
+    Footer() : juce::Component() {}
 
     void paint (juce::Graphics& g) override
     {
@@ -668,10 +668,6 @@ public:
                     juce::Justification::bottomRight);
     }
 
-    void resized() override { iemLogo.setBounds (0, 0, 40, getHeight()); }
-
-private:
-    IEMLogo iemLogo;
 };
 
 #ifdef JUCE_OSC_H_INCLUDED
@@ -691,7 +687,7 @@ public:
 
         bounds.removeFromBottom (2);
         bounds = bounds.removeFromBottom (16);
-        bounds.removeFromLeft (50);
+        // bounds.removeFromLeft (50);
         oscStatus.setBounds (bounds);
     }
 
