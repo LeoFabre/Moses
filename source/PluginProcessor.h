@@ -26,12 +26,9 @@
 
 #include "juce_dsp/juce_dsp.h"
 #include "AudioProcessorBase.h"
-#include "Compressor.h"
-
-#include "FilterVisualizerHelper.h"
 
 #define ProcessorClass MultiBandCompressorAudioProcessor
-#define numFilterBands 4
+#define numFilterBands 5
 
 using namespace juce::dsp;
 using ParameterLayout = juce::AudioProcessorValueTreeState::ParameterLayout;
@@ -90,6 +87,7 @@ public:
     {
         Low,
         MidLow,
+        Mid,
         MidHigh,
         High
     };

@@ -21,6 +21,8 @@
  */
 
 #include "PluginProcessor.h"
+
+#include "FilterVisualizerHelper.h"
 #include "PluginEditor.h"
 
 //==============================================================================
@@ -120,7 +122,7 @@ std::vector<std::unique_ptr<juce::RangedAudioParameter>>
     MultiBandCompressorAudioProcessor::createParameterLayout()
 {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
-    const float crossoverPresets[numFilterBands - 1] = { 80.0f, 440.0f, 2200.0f };
+    const float crossoverPresets[numFilterBands - 1] = { 80.0f, 440.0f, 2200.0f, 5000.0f };
 
     // Ambisonics Order
     auto floatParam = std::make_unique<juce::AudioParameterFloat> (
@@ -489,6 +491,11 @@ void MultiBandCompressorAudioProcessor::processBlock (juce::AudioSampleBuffer& b
         };
         juce::dsp::AudioBlock<IIRfloat> abMidLow(const_cast<IIRfloat**>(chPtrMidLow), 1, L);
 
+        const IIRfloat* chPtrMid[1] = {
+            freqBands[FrequencyBands::Mid][simdFilterIdx]->getChannelPointer(0)
+        };
+        juce::dsp::AudioBlock<IIRfloat> abMid(const_cast<IIRfloat**>(chPtrMid), 1, L);
+
         const IIRfloat* chPtrMidHigh[1] = {
             freqBands[FrequencyBands::MidHigh][simdFilterIdx]->getChannelPointer(0)
         };
@@ -499,6 +506,8 @@ void MultiBandCompressorAudioProcessor::processBlock (juce::AudioSampleBuffer& b
         };
         juce::dsp::AudioBlock<IIRfloat> abHigh(const_cast<IIRfloat**>(chPtrHigh), 1, L);
 
+
+        // Traitement de la bande Low
         iirLP[1][simdFilterIdx]->process(
             juce::dsp::ProcessContextNonReplacing<IIRfloat>(abInterleaved, abLow));
         iirHP[1][simdFilterIdx]->process(
@@ -507,6 +516,7 @@ void MultiBandCompressorAudioProcessor::processBlock (juce::AudioSampleBuffer& b
         iirLP2[1][simdFilterIdx]->process(juce::dsp::ProcessContextReplacing<IIRfloat>(abLow));
         iirHP2[1][simdFilterIdx]->process(juce::dsp::ProcessContextReplacing<IIRfloat>(abHigh));
 
+        // Traitement de la bande MidLow
         iirAP[2][simdFilterIdx]->process(juce::dsp::ProcessContextReplacing<IIRfloat>(abLow));
         iirAP[0][simdFilterIdx]->process(juce::dsp::ProcessContextReplacing<IIRfloat>(abHigh));
 
@@ -517,13 +527,24 @@ void MultiBandCompressorAudioProcessor::processBlock (juce::AudioSampleBuffer& b
         iirLP[0][simdFilterIdx]->process(juce::dsp::ProcessContextReplacing<IIRfloat>(abLow));
         iirLP2[0][simdFilterIdx]->process(juce::dsp::ProcessContextReplacing<IIRfloat>(abLow));
 
+        // Traitement de la bande Mid (nouvelle bande)
         iirLP[2][simdFilterIdx]->process(
+            juce::dsp::ProcessContextNonReplacing<IIRfloat>(abMidLow, abMid));
+        iirHP[2][simdFilterIdx]->process(
+            juce::dsp::ProcessContextNonReplacing<IIRfloat>(abMidLow, abMidHigh));
+
+        iirLP2[2][simdFilterIdx]->process(juce::dsp::ProcessContextReplacing<IIRfloat>(abMid));
+        iirHP2[2][simdFilterIdx]->process(juce::dsp::ProcessContextReplacing<IIRfloat>(abMidHigh));
+
+        // Traitement de la bande MidHigh
+        iirLP[3][simdFilterIdx]->process(
             juce::dsp::ProcessContextNonReplacing<IIRfloat>(abHigh, abMidHigh));
-        iirLP2[2][simdFilterIdx]->process(
+        iirLP2[3][simdFilterIdx]->process(
             juce::dsp::ProcessContextReplacing<IIRfloat>(abMidHigh));
 
-        iirHP[2][simdFilterIdx]->process(juce::dsp::ProcessContextReplacing<IIRfloat>(abHigh));
-        iirHP2[2][simdFilterIdx]->process(juce::dsp::ProcessContextReplacing<IIRfloat>(abHigh));
+        iirHP[3][simdFilterIdx]->process(juce::dsp::ProcessContextReplacing<IIRfloat>(abHigh));
+        iirHP2[3][simdFilterIdx]->process(juce::dsp::ProcessContextReplacing<IIRfloat>(abHigh));
+
     }
 
     buffer.clear();
