@@ -304,7 +304,7 @@ void MultiBandCompressorAudioProcessor::changeProgramName (int index, const juce
 //==============================================================================
 void MultiBandCompressorAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    checkInputAndOutput (this, *orderSetting, *orderSetting, true);
+    // checkInputAndOutput (this, *orderSetting, *orderSetting, true);
 
     lastSampleRate = sampleRate;
 
@@ -389,10 +389,10 @@ bool MultiBandCompressorAudioProcessor::isBusesLayoutSupported (const BusesLayou
 void MultiBandCompressorAudioProcessor::processBlock (juce::AudioSampleBuffer& buffer,
                                                       juce::MidiBuffer& midiMessages)
 {
-    checkInputAndOutput (this, *orderSetting, *orderSetting, false);
+    // checkInputAndOutput (this, *orderSetting, *orderSetting, false);
     juce::ScopedNoDenormals noDenormals;
 
-    const int maxNChIn = juce::jmin(buffer.getNumChannels(), input.getNumberOfChannels());
+    const int maxNChIn = buffer.getNumChannels();
     if (maxNChIn < 1)
         return;
 
@@ -691,10 +691,6 @@ void MultiBandCompressorAudioProcessor::parameterChanged (const juce::String& pa
         else
             soloArray.clearBit (parameterID.getLastCharacters (1).getIntValue());
     }
-    else if (parameterID == "orderSetting")
-    {
-        userChangedIOSettings = true;
-    }
     else if (parameterID.startsWith ("gain"))
     {
         const int bandId = parameterID.getLastCharacters (1).getIntValue();
@@ -707,11 +703,6 @@ void MultiBandCompressorAudioProcessor::parameterChanged (const juce::String& pa
     }
 }
 
-void MultiBandCompressorAudioProcessor::updateBuffers()
-{
-    DBG ("IOHelper:  input size: " << input.getSize());
-    DBG ("IOHelper: output size: " << output.getSize());
-}
 
 //==============================================================================
 // This creates new instances of the plugin..

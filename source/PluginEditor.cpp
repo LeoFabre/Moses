@@ -444,7 +444,7 @@ void MultiBandCompressorAudioProcessorEditor::buttonClicked (juce::Button* butto
 void MultiBandCompressorAudioProcessorEditor::timerCallback()
 {
     // === update titleBar widgets according to available input/output channel counts
-    title.setMaxSize (processor.getMaxSize());
+    // title.setMaxSize (processor.getMaxSize());
     // ==========================================
 
     if (processor.repaintFilterVisualization.get())
