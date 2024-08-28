@@ -102,6 +102,7 @@ private:
     // Band gain sliders
     ReverseSlider slBandGain[numFilterBands];
     std::unique_ptr<SliderAttachment> slBandGainAttachment[numFilterBands];
+    LevelMeter bandLevelMeters[numFilterBands];
 
     LevelMeter omniInputMeter, omniOutputMeter;
 

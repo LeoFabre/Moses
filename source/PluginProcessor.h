@@ -24,6 +24,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
+#include "Analyser.h"
 #include "juce_dsp/juce_dsp.h"
 #include "AudioProcessorBase.h"
 
@@ -52,6 +53,10 @@ public:
 #endif
 
     void processBlock (juce::AudioSampleBuffer&, juce::MidiBuffer&) override;
+
+    void createAnalyserPlot(juce::Path &p, juce::Rectangle<int> bounds, float minFreq, bool input);
+
+    bool checkForNewAnalyserData();
 
     //==============================================================================
     juce::AudioProcessorEditor* createEditor() override;
@@ -102,6 +107,11 @@ public:
     juce::Atomic<float> maxGR[numFilterBands], maxPeak[numFilterBands];
 
     juce::Atomic<bool> characteristicHasChanged[numFilterBands];
+
+
+    //analysers
+    Analyser<float> inputAnalyser;
+    Analyser<float> outputAnalyser;
 
 private:
     void calculateCoefficients (int index);

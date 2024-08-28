@@ -93,6 +93,7 @@ MultiBandCompressorAudioProcessorEditor::MultiBandCompressorAudioProcessorEditor
         tbBypass[i].addListener (this);
         addAndMakeVisible (&tbBypass[i]);
 
+        // ==== SLIDERS ====
         slBandGainAttachment[i] = std::make_unique<SliderAttachment>(valueTreeState, "gain" + juce::String(i), slBandGain[i]);
         slBandGain[i].setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
         slBandGain[i].setTextBoxStyle(juce::Slider::TextBoxBelow, false, 70, 12);
@@ -101,6 +102,11 @@ MultiBandCompressorAudioProcessorEditor::MultiBandCompressorAudioProcessorEditor
         slBandGain[i].setName("gain" + juce::String(i));
         slBandGain[i].addListener(this);
         addAndMakeVisible(&slBandGain[i]);
+
+        // ==== METERS ====
+        bandLevelMeters[i].setMinLevel(-60.0f);
+        bandLevelMeters[i].setColour(juce::Colours::green.withMultipliedAlpha(0.8f));
+        addAndMakeVisible(&bandLevelMeters[i]);
     }
 
     // ==== FILTER VISUALIZATION ====
@@ -202,6 +208,18 @@ MultiBandCompressorAudioProcessorEditor::~MultiBandCompressorAudioProcessorEdito
 void MultiBandCompressorAudioProcessorEditor::paint (juce::Graphics& g)
 {
     g.fillAll (globalLaF.ClBackground);
+
+    // Draw the input analyzer
+    juce::Path inputPath;
+    processor.inputAnalyser.createPath(inputPath, filterBankVisualizer.getBounds().toFloat().reduced(30,10), 20.0f);
+    g.setColour(juce::Colours::greenyellow);
+    g.strokePath(inputPath, juce::PathStrokeType(1.0f));
+
+    // Draw the output analyzer
+    juce::Path outputPath;
+    processor.outputAnalyser.createPath(outputPath, filterBankVisualizer.getBounds().toFloat().reduced(30,10), 20.0f);
+    g.setColour(juce::Colours::indianred);
+    g.strokePath(outputPath, juce::PathStrokeType(1.0f));
 }
 
 void MultiBandCompressorAudioProcessorEditor::resized()
@@ -332,16 +350,9 @@ void MultiBandCompressorAudioProcessorEditor::resized()
         labelRow1 = paramRow1.removeFromBottom (paramRow1.proportionOfHeight (labelToParamRatio));
         labelRow2 = paramRow2.removeFromBottom (paramRow2.proportionOfHeight (labelToParamRatio));
 
-        // Gain-Reduction meter (will make a band meter later out of this)
-        // grMeterArea = characteristicArea.removeFromRight (
-        //     characteristicArea.proportionOfWidth (meterToCharacteristicRatio));
-        // grMeterArea.removeFromLeft (meterToCharacteristicGap / 2);
-        // characteristicArea.removeFromRight (meterToCharacteristicGap / 2);
-        // GRmeter[i].setBounds (
-        //     grMeterArea.reduced (0, grMeterArea.proportionOfHeight (trimMeterHeightRatio)));
+        juce::Rectangle<int> levelMeterArea = characteristicArea.removeFromRight(20);
+        bandLevelMeters[i].setBounds(levelMeterArea.reduced(2));
 
-
-        // gainSliderArea = compressorArea.removeFromTop(150);  // Ajustez sliderHeight en fonction de votre disposition
         slBandGain[i].setBounds(characteristicArea.reduced(10,10));
 
         if (i < numFilterBands - 1)
@@ -466,10 +477,15 @@ void MultiBandCompressorAudioProcessorEditor::timerCallback()
         {
             processor.characteristicHasChanged[i] = false;
         }
-
-        // GRmeter[i].setLevel (gainReduction);
+        bandLevelMeters[i].setLevel(processor.maxPeak[i].get());
     }
 
     if (displayOverallMagnitude)
         filterBankVisualizer.updateOverallMagnitude();
+
+
+    if (processor.inputAnalyser.checkForNewData() || processor.outputAnalyser.checkForNewData())
+    {
+        repaint();
+    }
 }
