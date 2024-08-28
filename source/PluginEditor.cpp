@@ -348,6 +348,18 @@ MultiBandCompressorAudioProcessorEditor::~MultiBandCompressorAudioProcessorEdito
 void MultiBandCompressorAudioProcessorEditor::paint (juce::Graphics& g)
 {
     g.fillAll (globalLaF.ClBackground);
+
+    // Draw the input analyzer
+    juce::Path inputPath;
+    processor.inputAnalyser.createPath(inputPath, filterBankVisualizer.getBounds().toFloat().reduced(30,10), 20.0f);
+    g.setColour(juce::Colours::greenyellow);
+    g.strokePath(inputPath, juce::PathStrokeType(1.0f));
+
+    // Draw the output analyzer
+    juce::Path outputPath;
+    processor.outputAnalyser.createPath(outputPath, filterBankVisualizer.getBounds().toFloat().reduced(30,10), 20.0f);
+    g.setColour(juce::Colours::indianred);
+    g.strokePath(outputPath, juce::PathStrokeType(1.0f));
 }
 
 void MultiBandCompressorAudioProcessorEditor::resized()
@@ -658,4 +670,9 @@ void MultiBandCompressorAudioProcessorEditor::timerCallback()
 
     if (displayOverallMagnitude)
         filterBankVisualizer.updateOverallMagnitude();
+
+    if (processor.inputAnalyser.checkForNewData() || processor.outputAnalyser.checkForNewData())
+    {
+        repaint();
+    }
 }

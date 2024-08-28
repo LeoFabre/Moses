@@ -25,6 +25,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "juce_dsp/juce_dsp.h"
+#include "Analyser.h"
 #include "AudioProcessorBase.h"
 #include "Compressor.h"
 
@@ -55,6 +56,10 @@ public:
 #endif
 
     void processBlock (juce::AudioSampleBuffer&, juce::MidiBuffer&) override;
+
+    void createAnalyserPlot(juce::Path &p, juce::Rectangle<int> bounds, float minFreq, bool input);
+
+    bool checkForNewAnalyserData();
 
     //==============================================================================
     juce::AudioProcessorEditor* createEditor() override;
@@ -106,6 +111,10 @@ public:
     juce::Atomic<bool> characteristicHasChanged[numFilterBands];
 
     iem::Compressor* getCompressor (const int i) { return &compressors[i]; };
+
+    //analysers
+    Analyser<float> inputAnalyser;
+    Analyser<float> outputAnalyser;
 
 private:
     void calculateCoefficients (const int index);

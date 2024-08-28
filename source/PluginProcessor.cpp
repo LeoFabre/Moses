@@ -134,6 +134,8 @@ MultiBandCompressorAudioProcessor::MultiBandCompressorAudioProcessor() :
 
 MultiBandCompressorAudioProcessor::~MultiBandCompressorAudioProcessor()
 {
+    inputAnalyser.stopThread (1000);
+    outputAnalyser.stopThread (1000);
 }
 
 std::vector<std::unique_ptr<juce::RangedAudioParameter>>
@@ -474,6 +476,9 @@ void MultiBandCompressorAudioProcessor::prepareToPlay (double sampleRate, int sa
 
     tempBuffer.setSize (64, samplesPerBlock, false, true);
 
+    inputAnalyser.setupAnalyser  (int (sampleRate), float (sampleRate));
+    outputAnalyser.setupAnalyser (int (sampleRate), float (sampleRate));
+
     repaintFilterVisualization = true;
 }
 
@@ -481,6 +486,8 @@ void MultiBandCompressorAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
+    inputAnalyser.stopThread (1000);
+    outputAnalyser.stopThread (1000);
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -499,6 +506,9 @@ void MultiBandCompressorAudioProcessor::processBlock (juce::AudioSampleBuffer& b
     const int maxNChIn = buffer.getNumChannels();
     if (maxNChIn < 1)
         return;
+
+    if (getActiveEditor() != nullptr)
+        inputAnalyser.addAudioData (buffer, 0, getTotalNumInputChannels());
 
     const int L = buffer.getNumSamples();
     const int nSIMDFilters = 1 + (maxNChIn - 1) / IIRfloat_elements;
@@ -738,9 +748,24 @@ void MultiBandCompressorAudioProcessor::processBlock (juce::AudioSampleBuffer& b
         }
     }
 
-    outputPeak = juce::Decibels::gainToDecibels (buffer.getMagnitude (0, 0, L));
+
+    if (getActiveEditor() != nullptr)
+        outputAnalyser.addAudioData (buffer, 0, getTotalNumOutputChannels());
+    outputPeak = juce::Decibels::gainToDecibels(buffer.getMagnitude(0, 0, L));
 }
 
+void MultiBandCompressorAudioProcessor::createAnalyserPlot (juce::Path& p, const juce::Rectangle<int> bounds, float minFreq, bool input)
+{
+    if (input)
+        inputAnalyser.createPath (p, bounds.toFloat(), minFreq);
+    else
+        outputAnalyser.createPath (p, bounds.toFloat(), minFreq);
+}
+
+bool MultiBandCompressorAudioProcessor::checkForNewAnalyserData()
+{
+    return inputAnalyser.checkForNewData() || outputAnalyser.checkForNewData();
+}
 
 //==============================================================================
 bool MultiBandCompressorAudioProcessor::hasEditor() const
