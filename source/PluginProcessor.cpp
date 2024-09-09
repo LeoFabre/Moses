@@ -144,56 +144,8 @@ std::vector<std::unique_ptr<juce::RangedAudioParameter>>
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
     const float crossoverPresets[numFilterBands - 1] = { 80.0f, 440.0f, 2200.0f };
 
-    // Ambisonics Order
-    auto floatParam = std::make_unique<juce::AudioParameterFloat> (
-        "orderSetting",
-        "Ambisonics Order",
-        juce::NormalisableRange<float> (0.0f, 8.0f, 1.0f),
-        0.0f,
-        "",
-        juce::AudioProcessorParameter::genericParameter,
-        [] (float value, int maximumStringLength)
-        {
-            if (value >= 0.5f && value < 1.5f)
-                return "0th";
-            else if (value >= 1.5f && value < 2.5f)
-                return "1st";
-            else if (value >= 2.5f && value < 3.5f)
-                return "2nd";
-            else if (value >= 3.5f && value < 4.5f)
-                return "3rd";
-            else if (value >= 4.5f && value < 5.5f)
-                return "4th";
-            else if (value >= 5.5f && value < 6.5f)
-                return "5th";
-            else if (value >= 6.5f && value < 7.5f)
-                return "6th";
-            else if (value >= 7.5f)
-                return "7th";
-            else
-                return "Auto";
-        },
-        nullptr);
-    params.push_back (std::move (floatParam));
-
     // Normalization
-    floatParam = std::make_unique<juce::AudioParameterFloat> (
-        "useSN3D",
-        "Normalization",
-        juce::NormalisableRange<float> (0.0f, 1.0f, 1.0f),
-        1.0f,
-        "",
-        juce::AudioProcessorParameter::genericParameter,
-        [] (float value, int maximumStringLength)
-        {
-            if (value >= 0.5f)
-                return "SN3D";
-            else
-                return "N3D";
-        },
-        nullptr);
-    params.push_back (std::move (floatParam));
-
+    std::unique_ptr<juce::AudioParameterFloat> floatParam;
     // Crossovers
     for (int i = 0; i < numFilterBands - 1; ++i)
     {

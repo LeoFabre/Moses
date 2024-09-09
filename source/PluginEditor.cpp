@@ -36,22 +36,8 @@ MultiBandCompressorAudioProcessorEditor::MultiBandCompressorAudioProcessorEditor
     // set GUI size and lookAndFeel
     setResizeLimits (980, 980 * 0.6, 1600, 1600 * 0.6); // use this to create a resizable GUI
     setLookAndFeel (&globalLaF);
-
-    // make title and footer visible, and set the PluginName
-    addAndMakeVisible (&title);
-    title.setTitle (juce::String ("Moses"), "");
     addAndMakeVisible (&footer);
     // ============= END: essentials ========================
-
-    cbNormalizationAtachement =
-        std::make_unique<ComboBoxAttachment> (valueTreeState,
-                                              "useSN3D",
-                                              *title.getInputWidgetPtr()->getNormCbPointer());
-    cbOrderAtachement =
-        std::make_unique<ComboBoxAttachment> (valueTreeState,
-                                              "orderSetting",
-                                              *title.getInputWidgetPtr()->getOrderCbPointer());
-
     tooltips.setMillisecondsBeforeTipAppears (800);
     tooltips.setOpaque (false);
 
@@ -375,8 +361,6 @@ void MultiBandCompressorAudioProcessorEditor::resized()
 
     area.removeFromLeft (leftRightMargin);
     area.removeFromRight (leftRightMargin);
-    juce::Rectangle<int> headerArea = area.removeFromTop (headerHeight);
-    title.setBounds (headerArea);
     area.removeFromTop (10);
     area.removeFromBottom (5);
     // =========== END: header and footer =================

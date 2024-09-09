@@ -26,7 +26,6 @@
 
 #include "lookAndFeel/IEM_LaF.h"
 //Plugin Design Essentials
-#include "Components/TitleBar.h"
 
 //Custom juce::Components
 #include "Components/CompressorVisualizer.h"
@@ -35,6 +34,7 @@
 #include "Components/ReverseSlider.h"
 #include "Components/RoundButton.h"
 #include "Components/SimpleLabel.h"
+#include "Components/OSCFooter.h"
 #include "FilterBankVisualizer.h"
 #include "MasterControl.h"
 
@@ -81,7 +81,6 @@ private:
         - AmbisonicIOWidget<maxOrder>
         - DirectivitiyIOWidget
      */
-    TitleBar<AmbisonicIOWidget<>, NoIOWidget> title;
     OSCFooter footer;
     // =============== end essentials ============
 
