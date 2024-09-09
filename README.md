@@ -1,9 +1,12 @@
 # WORK IN PROGRESS - Moses - CMake, JUCE 6.1.6, ElkPi
-This is a JUCE-based crossover audio plugin that I'm making for my dub sound system control tower. 
-It is based on [IEMPluginSuite](https://git.iem.at/audioplugins/IEMPluginSuite)'s IEMMultiBandCompressor, but with a different goal and a different set of features.
+This is a JUCE-based Multibandcompressor/crossover audio plugin that I'm making for my dub sound system control tower. 
+It is based on [IEMPluginSuite](https://git.iem.at/audioplugins/IEMPluginSuite)'s IEMMultiBandCompressor, but with some modifications - 
+mainly the addition of kill switches, visualizer, and the removal of ambisonics code.
 
-Its goal is to provide a simple and efficient way to cut and gainstage the input audio across 4 frequency bands.  
-It is made for a control panel that features the controls needed.
+Its goal is to provide a simple and efficient way to cut and gainstage the input audio across 4 frequency bands, 
+like you would do on a dub sound system crossover, while having a compressor on each band.  
+
+The plugin is intended to be used in a live sound system setup, but it can also be used in a studio environment.
 
 I originally had an analog preamp with a 6-band crossover, but I wanted to have a more flexible and efficient way to control the sound,
 and most importantly, have clean filters and phase coherence - which analog crossovers don't always provide.
@@ -11,7 +14,7 @@ and most importantly, have clean filters and phase coherence - which analog cros
 
 Please feel free to contribute by opening a PR or an issue.
 
-# Features (planned)
+# Features
 - 4-band SIMD optimized crossover using cascaded Butterworth, linkwitz-riley filters and Allpass filters
 - Adjustable crossover frequencies
 - Solo and Kill switches for each band
@@ -22,8 +25,6 @@ Please feel free to contribute by opening a PR or an issue.
 - Input and output gain visualization
 - Input and output waveform visualization
 
-# User Documentation
-Soon come bredda ;)
 
 # Building the plugin
 
