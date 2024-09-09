@@ -35,8 +35,8 @@
 #include "Components/RoundButton.h"
 #include "Components/SimpleLabel.h"
 #include "Components/OSCFooter.h"
-#include "FilterBankVisualizer.h"
-#include "MasterControl.h"
+#include "Components/FilterBankVisualizer.h"
+#include "Components/MasterControl.h"
 
 using SliderAttachment = ReverseSlider::
     SliderAttachment; // all ReverseSliders will make use of the parameters' valueToText() function

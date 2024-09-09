@@ -25,11 +25,11 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 #include "juce_dsp/juce_dsp.h"
-#include "Analyser.h"
+#include "Components/Analyser.h"
 #include "AudioProcessorBase.h"
 #include "Compressor.h"
 
-#include "FilterVisualizerHelper.h"
+#include "Components/FilterVisualizerHelper.h"
 
 #define ProcessorClass MultiBandCompressorAudioProcessor
 #define numFilterBands 4

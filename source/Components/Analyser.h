@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include <juce_dsp/juce_dsp.h>
-#include <juce_gui_basics/juce_gui_basics.h>
+#include <../../JUCE/modules/juce_dsp/juce_dsp.h>
+#include <../../JUCE/modules/juce_gui_basics/juce_gui_basics.h>
 
 //==============================================================================
 /*

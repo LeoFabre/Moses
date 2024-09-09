@@ -21,7 +21,7 @@
  */
 
 #pragma once
-#include "Components/ReverseSlider.h"
+#include "ReverseSlider.h"
 
 //==============================================================================
 /**
