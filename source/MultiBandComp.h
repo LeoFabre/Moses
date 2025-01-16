@@ -28,18 +28,17 @@ struct Parameters {
     std::array<float, numBands> makeUpGain;
     bool stereo{ true };
     std::array<bool, numBands> listen{ false, false, false, false };
+    std::array<bool, numBands> kill{ false, false, false, false };
 };
 
 class MultiBandComp
 {
 public:
-    void setParameters(const AudioProcessorValueTreeState& apvts, 
-        const std::array<bool, numBands>& listenArr)
+    void setParameters(const AudioProcessorValueTreeState& apvts)
     {
         setCrossovers(apvts);
         anyListen = false;
         parameters.stereo = apvts.getRawParameterValue("stereo")->load();
-        parameters.listen = listenArr;
         for (int band = 0; band < numBands; band++)
         {
             const auto bandNum = String(band + 1);
@@ -53,7 +52,9 @@ public:
                 -1.0f / ((releaseInput / 1000.0f) * static_cast<float>(sampleRate)));
             const float ratio = apvts.getRawParameterValue("ratio" + bandNum)->load();
             parameters.slope[band] = 1.0f - (1.0f / ratio);
-            if (listenArr[band])
+            parameters.kill[band] = apvts.getRawParameterValue("kill" + bandNum)->load();
+            parameters.listen[band] = apvts.getRawParameterValue("listen" + bandNum)->load();
+            if (parameters.listen[band])
             {
                 anyListen = true;
             }
@@ -244,6 +245,11 @@ private:
         {
             for (int band = 0; band < numBands; band++)
             {
+                if (parameters.kill[band])
+                {
+                    bandBuffers[band].clear(channel, 0, bufferSize);
+                    continue;
+                }
                 if (anyListen)
                 {
                     if (parameters.listen[band])

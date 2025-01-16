@@ -34,6 +34,7 @@ MultiBandCompAudioProcessorEditor::MultiBandCompAudioProcessorEditor(MultiBandCo
     addAndMakeVisible(bgImage);
     addAndMakeVisible(powerLine);
     addAndMakeVisible(listenLabel);
+    addAndMakeVisible(killLabel);
     // frequency controls
     for (int crossover = 0; crossover < numBands - 1; crossover++) {
         addAndMakeVisible(freqKnobs[crossover].get());
@@ -55,6 +56,7 @@ MultiBandCompAudioProcessorEditor::MultiBandCompAudioProcessorEditor(MultiBandCo
         addAndMakeVisible(releaseKnobs[band].get());
         addAndMakeVisible(makeUpKnobs[band].get());
         addAndMakeVisible(listenButtons[band]);
+        addAndMakeVisible(killButtons[band]);
         thresholdAttach[band] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             audioProcessor.parameters, "threshold" + bandNum, *thresholdKnobs[band]);
         ratioAttach[band] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
@@ -65,15 +67,15 @@ MultiBandCompAudioProcessorEditor::MultiBandCompAudioProcessorEditor(MultiBandCo
             audioProcessor.parameters, "release" + bandNum, *releaseKnobs[band]);
         makeUpAttach[band] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             audioProcessor.parameters, "makeUp" + bandNum, *makeUpKnobs[band]);
+        listenAttach[band] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+            audioProcessor.parameters, "listen" + bandNum, listenButtons[band]);
+        killAttach[band] = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+            audioProcessor.parameters, "kill" + bandNum, killButtons[band]);
     }
     addAndMakeVisible(stereoButton);
     stereoAttach = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
         audioProcessor.parameters, "stereo", stereoButton);
-    listenButtons[0].onClick = [&]() { audioProcessor.listen[0] = listenButtons[0].getToggleState(); };
-    listenButtons[1].onClick = [&]() { audioProcessor.listen[1] = listenButtons[1].getToggleState(); };
-    listenButtons[2].onClick = [&]() { audioProcessor.listen[2] = listenButtons[2].getToggleState(); };
-    listenButtons[3].onClick = [&]() { audioProcessor.listen[3] = listenButtons[3].getToggleState(); };
-    setSize(730, 480);
+    setSize(730, 560);
 }
 
 MultiBandCompAudioProcessorEditor::~MultiBandCompAudioProcessorEditor()
@@ -100,6 +102,7 @@ void MultiBandCompAudioProcessorEditor::resized()
                                           15);
         listenButtons[band].setBounds(makeUpKnobs[band].get()->getX() - 5, makeUpKnobs[band].get()->getBottom() + 30,
                                       50, 50);
+        killButtons[band].setBounds(listenButtons[band].getX(), listenButtons[band].getBottom() + 30, 50, 50);
     }
     for (int crossover = 0; crossover < numBands - 1; crossover++) {
         freqKnobs[crossover].get()->setBounds(ratioKnobs[crossover + 1].get()->getX() - 40, 60, 50, 80);
@@ -108,4 +111,5 @@ void MultiBandCompAudioProcessorEditor::resized()
     const int xPos = listenButtons[0].getX() + (listenButtons[0].getWidth() / 2) - 1;
     const int width = listenButtons[3].getX() + (listenButtons[3].getWidth() / 2) - xPos + 1;
     listenLabel.setBounds(xPos, listenButtons[0].getY() - 20, width, 13);
+    killLabel.setBounds(xPos, killButtons[0].getY() - 20, width, 13);
 }

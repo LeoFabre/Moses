@@ -65,9 +65,14 @@ private:
     std::array<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>, numBands> thresholdAttach,
             ratioAttach, attackAttach, releaseAttach, makeUpAttach;
     SmallButton stereoButton{"Stereo"};
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> stereoAttach;
+    std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> stereoAttach;
     MultiLabel listenLabel{"Listen"};
+    MultiLabel killLabel{"Kill"};
     std::array<SmallButton, numBands> listenButtons;
+    std::array<std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment>, numBands> listenAttach;
+
+    std::array<SmallButton, numBands> killButtons;
+    std::array<std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment>, numBands> killAttach;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MultiBandCompAudioProcessorEditor)
 };

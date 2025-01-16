@@ -35,7 +35,9 @@ MultiBandCompAudioProcessor::MultiBandCompAudioProcessor()
     for (int band = 1; band <= numBands; band++)
     {
         const auto bandNum = juce::String(band);
-        parameters.createAndAddParameter(std::make_unique<juce::AudioParameterFloat>("threshold" + bandNum, 
+        parameters.createAndAddParameter(std::make_unique<juce::AudioParameterBool>("listen" + bandNum, "Band " + bandNum + " Listen", false));
+        parameters.createAndAddParameter(std::make_unique<juce::AudioParameterBool>("kill" + bandNum, "Band " + bandNum + " Kill", false));
+        parameters.createAndAddParameter(std::make_unique<juce::AudioParameterFloat>("threshold" + bandNum,
             "Band " + bandNum + " Threshold", juce::NormalisableRange<float>(-40.0f, 0.0f, 0.1f), 0.0f, "dB"));
         parameters.createAndAddParameter(std::make_unique<juce::AudioParameterFloat>("attack" + bandNum, 
             "Band " + bandNum + " Attack", juce::NormalisableRange<float>(0.5f, 100.0f, 0.5f), 10.0f, "ms"));
@@ -52,7 +54,7 @@ MultiBandCompAudioProcessor::MultiBandCompAudioProcessor()
 void MultiBandCompAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     multibandComp.prepare(sampleRate, samplesPerBlock);
-    multibandComp.setParameters(parameters, listen);
+    multibandComp.setParameters(parameters);
 }
 
 void MultiBandCompAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
@@ -61,7 +63,7 @@ void MultiBandCompAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     for (auto i = getTotalNumInputChannels(); i < getTotalNumOutputChannels(); ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    multibandComp.setParameters(parameters, listen);
+    multibandComp.setParameters(parameters);
     multibandComp.process(buffer);
     gainReduction = multibandComp.getGainReduction();
 }
