@@ -1,133 +1,73 @@
 /*
- ==============================================================================
- This file is part of the IEM plug-in suite.
- Author: Markus Huber
- Copyright (c) 2017 - Institute of Electronic Music and Acoustics (IEM)
- https://iem.at
-
- The IEM plug-in suite is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- The IEM plug-in suite is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this software.  If not, see <https://www.gnu.org/licenses/>.
- ==============================================================================
- */
+*   MultiBandComp Plugin
+*
+*   Made by Jacob Curtis
+*   Using JUCE Framework
+*   Tested on Windows 10 using Reaper in VST3 format
+*
+*/
 
 #pragma once
-
 #include "PluginProcessor.h"
+#include "../../Modules/GUI-Components.h"
+#include "../../Modules/Meters.h"
 
-#include "lookAndFeel/IEM_LaF.h"
-//Plugin Design Essentials
-
-//Custom juce::Components
-#include "Components/CompressorVisualizer.h"
-#include "Components/FilterVisualizer.h"
-#include "Components/LevelMeter.h"
-#include "Components/ReverseSlider.h"
-#include "Components/RoundButton.h"
-#include "Components/SimpleLabel.h"
-#include "Components/OSCFooter.h"
-#include "Components/FilterBankVisualizer.h"
-#include "Components/MasterControl.h"
-
-using SliderAttachment = ReverseSlider::
-    SliderAttachment; // all ReverseSliders will make use of the parameters' valueToText() function
-using ComboBoxAttachment = juce::AudioProcessorValueTreeState::ComboBoxAttachment;
-using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
-
-//==============================================================================
-/**
-*/
-class MultiBandCompressorAudioProcessorEditor : public juce::AudioProcessorEditor,
-                                                private juce::Timer,
-                                                public juce::Slider::Listener,
-                                                public juce::Button::Listener
+class MultiBandCompAudioProcessorEditor : public juce::AudioProcessorEditor
 {
 public:
-    MultiBandCompressorAudioProcessorEditor (MultiBandCompressorAudioProcessor&,
-                                             juce::AudioProcessorValueTreeState&);
-    ~MultiBandCompressorAudioProcessorEditor();
+    MultiBandCompAudioProcessorEditor(MultiBandCompAudioProcessor &);
 
-    //==============================================================================
-    void paint (juce::Graphics&) override;
+    ~MultiBandCompAudioProcessorEditor() override;
+
+    void paint(juce::Graphics &) override {}
+
     void resized() override;
 
-    void sliderValueChanged (juce::Slider* slider) override;
-    void buttonClicked (juce::Button* bypassButton) override;
-
-    void timerCallback() override;
-
 private:
-    // ====================== begin essentials ==================
-    // lookAndFeel class with the IEM plug-in suite design
-    LaF globalLaF;
+    MultiBandCompAudioProcessor &audioProcessor;
 
-    // stored references to the AudioProcessor and juce::ValueTreeState holding all the parameters
-    MultiBandCompressorAudioProcessor& processor;
-    juce::AudioProcessorValueTreeState& valueTreeState;
+    BgImage bgImage;
+    PowerLine powerLine{"Multiband Comp", "Jacob Curtis", 30};
+    std::array<std::unique_ptr<MultiLabel>, numBands> bandLabels;
+    std::array<std::unique_ptr<GainReductionMeter>, numBands> grMeters;
+    std::array<std::unique_ptr<SmallKnob>, numBands - 1> freqKnobs;
+    std::array<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>, numBands - 1> freqAttach;
+    std::array<std::unique_ptr<OuterKnob>, numBands> ratioKnobs{
+        std::make_unique<OuterKnob>(": 1"),
+        std::make_unique<OuterKnob>(": 1"),
+        std::make_unique<OuterKnob>(": 1"),
+        std::make_unique<OuterKnob>(": 1"),
+        };
+    std::array<std::unique_ptr<SmallKnob>, numBands> thresholdKnobs{
+        std::make_unique<SmallKnob>("", "dB"),
+        std::make_unique<SmallKnob>("", "dB"),
+        std::make_unique<SmallKnob>("", "dB"),
+        std::make_unique<SmallKnob>("", "dB")
+    };
+    std::array<std::unique_ptr<SmallKnob>, numBands> attackKnobs{
+        std::make_unique<SmallKnob>("Attack", "ms"),
+        std::make_unique<SmallKnob>("Attack", "ms"),
+        std::make_unique<SmallKnob>("Attack", "ms"),
+        std::make_unique<SmallKnob>("Attack", "ms")
+    };
+    std::array<std::unique_ptr<SmallKnob>, numBands> releaseKnobs{
+        std::make_unique<SmallKnob>("Release", "ms"),
+        std::make_unique<SmallKnob>("Release", "ms"),
+        std::make_unique<SmallKnob>("Release", "ms"),
+        std::make_unique<SmallKnob>("Release", "ms")
+    };
+    std::array<std::unique_ptr<SmallKnob>, numBands> makeUpKnobs{
+        std::make_unique<SmallKnob>("Gain", "dB"),
+        std::make_unique<SmallKnob>("Gain", "dB"),
+        std::make_unique<SmallKnob>("Gain", "dB"),
+        std::make_unique<SmallKnob>("Gain", "dB")
+    };
+    std::array<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>, numBands> thresholdAttach,
+            ratioAttach, attackAttach, releaseAttach, makeUpAttach;
+    SmallButton stereoButton{"Stereo"};
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> stereoAttach;
+    MultiLabel listenLabel{"Listen"};
+    std::array<SmallButton, numBands> listenButtons;
 
-    /* title and footer component
-     title component can hold different widgets for in- and output:
-        - NoIOWidget (if there's no need for an input or output widget)
-        - AudioChannelsIOWidget<maxNumberOfChannels, isChoosable>
-        - AmbisonicIOWidget<maxOrder>
-        - DirectivitiyIOWidget
-     */
-    OSCFooter footer;
-    // =============== end essentials ============
-
-    std::unique_ptr<ComboBoxAttachment> cbNormalizationAtachement;
-    std::unique_ptr<ComboBoxAttachment> cbOrderAtachement;
-
-    FilterBankVisualizer<double> filterBankVisualizer;
-    juce::TooltipWindow tooltips;
-
-    // Filter Crossovers
-    ReverseSlider slCrossover[numFilterBands - 1];
-    std::unique_ptr<SliderAttachment> slCrossoverAttachment[numFilterBands - 1];
-
-    // Solo and Bypass juce::Buttons
-    RoundButton tbKill[numFilterBands];
-    RoundButton tbSolo[numFilterBands];
-    RoundButton tbBypass[numFilterBands];
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
-        soloAttachment[numFilterBands], bypassAttachment[numFilterBands];
-
-    // Compressor Parameters
-    ReverseSlider slKnee[numFilterBands], slThreshold[numFilterBands], slRatio[numFilterBands],
-        slAttackTime[numFilterBands], slReleaseTime[numFilterBands], slMakeUpGain[numFilterBands];
-    std::unique_ptr<SliderAttachment> slKneeAttachment[numFilterBands],
-        slThresholdAttachment[numFilterBands], slRatioAttachment[numFilterBands],
-        slAttackTimeAttachment[numFilterBands], slReleaseTimeAttachment[numFilterBands],
-        slMakeUpGainAttachment[numFilterBands];
-
-    // Master parameters
-    juce::GroupComponent gcMasterControls;
-    MasterControl slMasterThreshold, slMasterMakeUpGain, slMasterKnee, slMasterRatio,
-        slMasterAttackTime, slMasterReleaseTime;
-
-    // Compressor Visualization
-    juce::OwnedArray<CompressorVisualizer> compressorVisualizers;
-
-    // Meters
-    LevelMeter GRmeter[numFilterBands], omniInputMeter, omniOutputMeter;
-
-    // juce::Toggle juce::Buttons
-    juce::ToggleButton tbOverallMagnitude;
-    bool displayOverallMagnitude { false };
-
-    // juce::Labels
-    SimpleLabel lbKnee[numFilterBands + 1], lbThreshold[numFilterBands + 1],
-        lbMakeUpGain[numFilterBands + 1], lbRatio[numFilterBands + 1], lbAttack[numFilterBands + 1],
-        lbRelease[numFilterBands + 1], lbInput, lbOutput;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultiBandCompressorAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MultiBandCompAudioProcessorEditor)
 };

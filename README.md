@@ -1,7 +1,7 @@
 # WORK IN PROGRESS - Moses - CMake, JUCE 6.1.6, ElkPi
 This is a JUCE-based Multibandcompressor/crossover audio plugin that I'm making for my dub sound system control tower. 
-It is based on [IEMPluginSuite](https://git.iem.at/audioplugins/IEMPluginSuite)'s IEMMultiBandCompressor, but with some modifications - 
-mainly the addition of kill switches, visualizer, and the removal of ambisonics code.
+It is based on [Jacob Curtis](https://git.iem.at/audioplugins/IEMPluginSuite)'s MultiBandComp, but with some modifications - 
+mainly the addition of kill switches, and removal of some assets like background and fonts to make it compile to ELK Audio OS.
 
 Its goal is to provide a simple and efficient way to cut and gainstage the input audio across 4 frequency bands, 
 like you would do on a dub sound system crossover, while having a compressor on each band.  
@@ -15,15 +15,12 @@ and most importantly, have clean filters and phase coherence - which analog cros
 Please feel free to contribute by opening a PR or an issue.
 
 # Features
-- 4-band SIMD optimized crossover using cascaded Butterworth, linkwitz-riley filters and Allpass filters
+- 4-band crossover using cascaded linkwitz-riley filters and AllPass filters
 - Adjustable crossover frequencies
-- Solo and Kill switches for each band
-- OSC and MIDI controls for all parameters
+- Solo ~~and Kill~~ switches for each band
 - Filter phase coherence
 - Clean filters
-- Filters visualization
 - Input and output gain visualization
-- Input and output waveform visualization
 
 
 # Building the plugin
