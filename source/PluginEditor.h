@@ -30,6 +30,7 @@ private:
     PowerLine powerLine{"Multiband Comp", "Jacob Curtis", 30};
     std::array<std::unique_ptr<MultiLabel>, numBands> bandLabels;
     std::array<std::unique_ptr<GainReductionMeter>, numBands> grMeters;
+    std::array<std::unique_ptr<LevelMeter>, numBands> levelMeters;
     std::array<std::unique_ptr<SmallKnob>, numBands - 1> freqKnobs;
     std::array<std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>, numBands - 1> freqAttach;
     std::array<std::unique_ptr<OuterKnob>, numBands> ratioKnobs{

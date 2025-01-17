@@ -112,6 +112,12 @@ public:
         return output;
     }
 
+    std::array<std::array<float, numOutputs>, numBands> getOutputLevels()
+    {
+        return outputLevels;
+    }
+
+
 private:
     void setCrossovers(const AudioProcessorValueTreeState& apvts)
     {
@@ -233,6 +239,8 @@ private:
                     // apply compression to buffer
                     bandBuffers[band].setSample(channel, sample, 
                         bandBuffers[band].getSample(channel, sample) * currentGainReduction);
+                    // store output levels for visualization
+                    outputLevels[band][channel] = bandBuffers[band].getRMSLevel(channel, 0, bufferSize);
                 }
             }
         }
@@ -274,6 +282,7 @@ private:
     const NormalisableRange<float> freqRange{ 20.0f, 15000.0f, 1.0f, 0.25f };
     std::array<float, numBands * numOutputs> compressionLevel;
     std::array<float, numBands * numOutputs> outputGainReduction;
+    std::array<std::array<float, numOutputs>, numBands> outputLevels; // Ajouter ceci
     AudioBuffer<float> stage1LowBuffer, stage1HighBuffer;
     std::array<AudioBuffer<float>, numBands> bandBuffers;
     std::array<AudioBuffer<float>, numBands> envelopeBuffers;

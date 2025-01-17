@@ -66,6 +66,7 @@ void MultiBandCompAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     multibandComp.setParameters(parameters);
     multibandComp.process(buffer);
     gainReduction = multibandComp.getGainReduction();
+    outputLevels = multibandComp.getOutputLevels();
 }
 
 void MultiBandCompAudioProcessor::getStateInformation(juce::MemoryBlock& destData)

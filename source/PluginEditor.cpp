@@ -19,6 +19,12 @@ MultiBandCompAudioProcessorEditor::MultiBandCompAudioProcessorEditor(MultiBandCo
           std::make_unique<GainReductionMeter>(audioProcessor.gainReduction[2]),
           std::make_unique<GainReductionMeter>(audioProcessor.gainReduction[3])
       },
+      levelMeters{ // Ajouter ceci
+          std::make_unique<LevelMeter>(audioProcessor.outputLevels[0]),
+          std::make_unique<LevelMeter>(audioProcessor.outputLevels[1]),
+          std::make_unique<LevelMeter>(audioProcessor.outputLevels[2]),
+          std::make_unique<LevelMeter>(audioProcessor.outputLevels[3])
+      },
       freqKnobs{
           std::make_unique<SmallKnob>("Freq", "Hz"),
           std::make_unique<SmallKnob>("Freq", "Hz"),
@@ -50,6 +56,7 @@ MultiBandCompAudioProcessorEditor::MultiBandCompAudioProcessorEditor(MultiBandCo
         const auto bandNum = juce::String(band + 1);
         addAndMakeVisible(bandLabels[band].get());
         addAndMakeVisible(grMeters[band].get());
+        addAndMakeVisible(levelMeters[band].get());
         addAndMakeVisible(ratioKnobs[band].get());
         addAndMakeVisible(thresholdKnobs[band].get());
         addAndMakeVisible(attackKnobs[band].get());
@@ -75,7 +82,7 @@ MultiBandCompAudioProcessorEditor::MultiBandCompAudioProcessorEditor(MultiBandCo
     addAndMakeVisible(stereoButton);
     stereoAttach = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
         audioProcessor.parameters, "stereo", stereoButton);
-    setSize(730, 560);
+    setSize(1000, 560);
 }
 
 MultiBandCompAudioProcessorEditor::~MultiBandCompAudioProcessorEditor()
@@ -87,8 +94,9 @@ void MultiBandCompAudioProcessorEditor::resized()
 {
     bgImage.setBounds(getLocalBounds());
     powerLine.setBounds(0, 10, 300, 50);
+    const int bandWidth = 220;
     for (int band = 0; band < numBands; band++) {
-        ratioKnobs[band].get()->setBounds(band * 170 + 40, 170, 80, 120);
+        ratioKnobs[band].get()->setBounds(band * (bandWidth + 10) + 40, 170, 80, 120);
         thresholdKnobs[band].get()->setBounds(ratioKnobs[band].get()->getInnerArea());
         attackKnobs[band].get()->setBounds(ratioKnobs[band].get()->getX() - 10,
                                            ratioKnobs[band].get()->getBottom() - 25, 40, 70);
@@ -98,7 +106,9 @@ void MultiBandCompAudioProcessorEditor::resized()
                                            40, 70);
         grMeters[band].get()->setBounds(ratioKnobs[band].get()->getRight() + 20, ratioKnobs[band].get()->getY() - 10,
                                         grMeters[band].get()->getMeterWidth(), grMeters[band].get()->getMeterHeight());
-        bandLabels[band].get()->setBounds(ratioKnobs[band].get()->getX() - 10, ratioKnobs[band].get()->getY() - 30, 160,
+        levelMeters[band].get()->setBounds(grMeters[band]->getRight() + 10, grMeters[band]->getY() + 10,
+                                           levelMeters[band]->getMeterWidth(), levelMeters[band]->getMeterHeight());
+        bandLabels[band].get()->setBounds(ratioKnobs[band].get()->getX() - 10, ratioKnobs[band].get()->getY() - 30, bandWidth,
                                           15);
         listenButtons[band].setBounds(makeUpKnobs[band].get()->getX() - 5, makeUpKnobs[band].get()->getBottom() + 30,
                                       50, 50);

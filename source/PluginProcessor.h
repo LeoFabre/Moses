@@ -43,7 +43,7 @@ public:
 
     juce::AudioProcessorValueTreeState parameters;
     std::array<std::array<float, 2>, numBands> gainReduction;
-
+    std::array<std::array<float, 2>, numBands> outputLevels;
 private:
     MultiBandComp multibandComp;
 
