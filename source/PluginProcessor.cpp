@@ -64,6 +64,8 @@ void MultiBandCompAudioProcessor::prepareToPlay(double sampleRate, int samplesPe
 {
     multibandComp.prepare(sampleRate, samplesPerBlock);
     multibandComp.setParameters(parameters);
+    meterUpdateInterval = juce::roundToInt(sampleRate / 30.0); // ~30 fps
+    meterSampleCounter  = 0;
 }
 
 void MultiBandCompAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &)
@@ -74,23 +76,33 @@ void MultiBandCompAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
 
     multibandComp.setParameters(parameters);
     multibandComp.process(buffer);
-    gainReduction = multibandComp.getGainReduction();
-    outputLevels = multibandComp.getOutputLevels();
-    for (int band = 0; band < numBands; ++band) {
-        const auto bandNum = juce::String(band + 1);
-        float grValue = std::min(gainReduction[band][0], gainReduction[band][1]);
-        DBG("GR " + bandNum + ": " + juce::String(grValue));
-        grValue = jlimit(0.0f, 40.0f, grValue);
-        float normalizedGR = juce::NormalisableRange<float>(0.0f, 40.0f).convertTo0to1(grValue);
-        parameters.getParameter("GR " + bandNum)->setValueNotifyingHost(normalizedGR);
-        // DBG("GR " + bandNum + ": " + juce::String(grValue));
 
-        float outValue = std::max(outputLevels[band][0], outputLevels[band][1]);
-        outValue = Decibels::gainToDecibels(outValue);
-        outValue = jlimit(-60.0f, 1.0f, outValue);
-        float normalizedOUT = juce::NormalisableRange<float>(-60.0f, 1.0f)
-                                  .convertTo0to1(outValue);
-        parameters.getParameter("OUT " + bandNum)->setValueNotifyingHost(normalizedOUT);
+    // Always refresh the meter arrays so the editor always has fresh data.
+    gainReduction = multibandComp.getGainReduction();
+    outputLevels  = multibandComp.getOutputLevels();
+
+    // Throttle CC/automation notifications to ~30 fps to avoid flooding the
+    // host automation bus and any downstream MIDI CC routing.
+    meterSampleCounter += buffer.getNumSamples();
+    if (meterSampleCounter >= meterUpdateInterval)
+    {
+        meterSampleCounter -= meterUpdateInterval;
+
+        for (int band = 0; band < numBands; ++band)
+        {
+            const auto bandNum = juce::String(band + 1);
+
+            float grValue = std::min(gainReduction[band][0], gainReduction[band][1]);
+            grValue = jlimit(0.0f, 40.0f, grValue);
+            float normalizedGR = juce::NormalisableRange<float>(0.0f, 40.0f).convertTo0to1(grValue);
+            parameters.getParameter("GR " + bandNum)->setValueNotifyingHost(normalizedGR);
+
+            float outValue = std::max(outputLevels[band][0], outputLevels[band][1]);
+            outValue = Decibels::gainToDecibels(outValue);
+            outValue = jlimit(-60.0f, 1.0f, outValue);
+            float normalizedOUT = juce::NormalisableRange<float>(-60.0f, 1.0f).convertTo0to1(outValue);
+            parameters.getParameter("OUT " + bandNum)->setValueNotifyingHost(normalizedOUT);
+        }
     }
 }
 

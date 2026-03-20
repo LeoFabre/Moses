@@ -47,5 +47,12 @@ public:
 private:
     MultiBandComp multibandComp;
 
+    // Frame-rate limiter for GR / output-level CC outputs.
+    // setValueNotifyingHost is called at most once per meterUpdateInterval samples
+    // (~30 fps) so the host automation bus and any downstream MIDI CC routing
+    // aren't flooded at audio-callback rate.
+    int meterUpdateInterval{ 0 };
+    int meterSampleCounter{ 0 };
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MultiBandCompAudioProcessor)
 };
